@@ -1,0 +1,104 @@
+digraph classes {
+    rankdir=TB;
+    dpi=170;
+    nodesep=0.55;
+    ranksep=0.8;
+    node [fontname="DejaVu Sans", fontsize=13, shape=plaintext];
+    edge [fontname="DejaVu Sans", fontsize=12, color="#444444"];
+
+    SelfCheck [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="#f4f4f4" COLOR="#666666">
+      <TR><TD ALIGN="CENTER"><B>SelfCheck</B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">- SERVICE: OrderService</TD></TR>
+      <TR><TD ALIGN="LEFT">- CSV_PATH: String</TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">+ main(args: String[]): void</TD></TR>
+      <TR><TD ALIGN="LEFT">- unitChecks(): void</TD></TR>
+      <TR><TD ALIGN="LEFT">- dataDriven(): void</TD></TR>
+      <TR><TD ALIGN="LEFT">- interactive(): void</TD></TR>
+    </TABLE>>];
+
+    OrderService [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="#e3f0ff" COLOR="#4a6fa5">
+      <TR><TD ALIGN="CENTER"><B>OrderService</B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">(без полей, stateless)</TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">+ createOrder(employee: Employee): Order</TD></TR>
+      <TR><TD ALIGN="LEFT"><B>+ addMinQuantityCheck(order: Order): boolean</B>  // вариант 2, часть Б</TD></TR>
+    </TABLE>>];
+
+    Order [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="#e3f0ff" COLOR="#4a6fa5">
+      <TR><TD ALIGN="CENTER"><B>Order</B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">- employee: Employee  {final}</TD></TR>
+      <TR><TD ALIGN="LEFT">- items: List&lt;OrderItem&gt;  {final}</TD></TR>
+      <TR><TD ALIGN="LEFT">- status: OrderStatus</TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">+ Order(employee: Employee)</TD></TR>
+      <TR><TD ALIGN="LEFT">+ addProduct(product: Product, quantity: int): void</TD></TR>
+      <TR><TD ALIGN="LEFT">+ removeProduct(productId: String): void</TD></TR>
+      <TR><TD ALIGN="LEFT">+ total(): double</TD></TR>
+      <TR><TD ALIGN="LEFT">+ confirm(): void</TD></TR>
+      <TR><TD ALIGN="LEFT">+ getItems(): List&lt;OrderItem&gt;  // List.copyOf</TD></TR>
+      <TR><TD ALIGN="LEFT">+ getStatus(): OrderStatus</TD></TR>
+      <TR><TD ALIGN="LEFT">+ getEmployee(): Employee</TD></TR>
+      <TR><TD ALIGN="LEFT">- requireDraft(): void</TD></TR>
+      <TR><TD ALIGN="LEFT">- findItem(productId: String): OrderItem</TD></TR>
+    </TABLE>>];
+
+    OrderItem [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="#e3f0ff" COLOR="#4a6fa5">
+      <TR><TD ALIGN="CENTER"><B>OrderItem</B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT"><B>+ MIN_QUANTITY: int = 5</B>  {static final}  // вариант 2, часть А</TD></TR>
+      <TR><TD ALIGN="LEFT">+ MAX_QUANTITY: int = 100  {static final}</TD></TR>
+      <TR><TD ALIGN="LEFT">- product: Product  {final}</TD></TR>
+      <TR><TD ALIGN="LEFT">- quantity: int</TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">+ OrderItem(product: Product, quantity: int)</TD></TR>
+      <TR><TD ALIGN="LEFT">- setQuantity(quantity: int): void</TD></TR>
+      <TR><TD ALIGN="LEFT">+ increase(delta: int): void</TD></TR>
+      <TR><TD ALIGN="LEFT">+ getLineTotal(): double</TD></TR>
+      <TR><TD ALIGN="LEFT">+ getProduct(): Product</TD></TR>
+      <TR><TD ALIGN="LEFT">+ getQuantity(): int</TD></TR>
+    </TABLE>>];
+
+    Product [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="#e3f0ff" COLOR="#4a6fa5">
+      <TR><TD ALIGN="CENTER"><B>Product</B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">- id: String  {final}</TD></TR>
+      <TR><TD ALIGN="LEFT">- name: String  {final}</TD></TR>
+      <TR><TD ALIGN="LEFT">- price: double  {final}</TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">+ Product(id: String, name: String, price: double)</TD></TR>
+      <TR><TD ALIGN="LEFT">+ getId(): String</TD></TR>
+      <TR><TD ALIGN="LEFT">+ getName(): String</TD></TR>
+      <TR><TD ALIGN="LEFT">+ getPrice(): double</TD></TR>
+    </TABLE>>];
+
+    Employee [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="#e8f0e0" COLOR="#5a7a3c">
+      <TR><TD ALIGN="CENTER">&lt;&lt;record&gt;&gt;<BR/><B>Employee</B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">id: String<BR ALIGN="LEFT"/>fullName: String<BR ALIGN="LEFT"/></TD></TR>
+    </TABLE>>];
+
+    OrderStatus [label=<
+    <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="5" BGCOLOR="#e8f0e0" COLOR="#5a7a3c">
+      <TR><TD ALIGN="CENTER">&lt;&lt;enumeration&gt;&gt;<BR/><B>OrderStatus</B></TD></TR>
+      <HR/>
+      <TR><TD ALIGN="LEFT">DRAFT<BR ALIGN="LEFT"/>CONFIRMED<BR ALIGN="LEFT"/></TD></TR>
+    </TABLE>>];
+
+    SelfCheck -> OrderService [label=" uses", style=dashed, arrowhead=open];
+    SelfCheck -> Order [label=" tests", style=dashed, arrowhead=open];
+    OrderService -> Order [label=" creates / analyzes", style=dashed, arrowhead=open];
+    Order -> OrderItem [label=" 0..*  items", arrowtail=diamond, dir=both, arrowhead=vee];
+    Order -> Employee [label=" 1", arrowtail=odiamond, dir=both, arrowhead=vee];
+    Order -> OrderStatus [label=" 1  status", style=dashed, arrowhead=open];
+    OrderItem -> Product [label=" 1", arrowtail=odiamond, dir=both, arrowhead=vee];
+}

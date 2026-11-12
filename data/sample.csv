@@ -1,0 +1,44 @@
+# sample.csv – контрольные значения ПР7 (вариант 2: количество позиции в [5, 100])
+# Формат: productId;name;price;quantity;expected
+# expected: OK:qty=N | OK:merged,qty=N | SKIP:<причина> (IllegalArgumentException) | ERROR:IllegalStateException
+# Служебные строки: !confirm;;;;ожидание, !remove;<id>;;;ожидание, TOTAL;positions=N;sum=X. Строки с # – комментарии.
+productId;name;price;quantity;expected
+# === Корректные продукты ===
+M01;Monitor 27;32990;5;OK:qty=5
+K01;Keyboard;4490;10;OK:qty=10
+M02;Monitor 32;45000;5;OK:qty=5
+P01;Printer;15000;6;OK:qty=6
+# === Объединение повторов (R7): M01 уже есть, 5 + 3 = 8 ===
+M01;Monitor 27;32990;3;OK:merged,qty=8
+# === Ошибка цены (R3): отрицательная и нулевая ===
+X01;Broken;-100;5;SKIP:price must be > 0
+X02;Free;0;5;SKIP:price must be > 0
+# === Границы количества: 5 и 100 допустимы, 4 и 101 нет (вариант 2) ===
+L01;Lamp;1000;5;OK:qty=5
+L02;Lamp Pro;2000;100;OK:qty=100
+L03;Lamp Mini;3000;4;SKIP:quantity must be in [5, 100]
+L04;Lamp Max;3000;101;SKIP:quantity must be in [5, 100]
+L05;Lamp Zero;3000;0;SKIP:quantity must be in [5, 100]
+# === Объединение сверх 100 отклоняется, позиция остаётся 100 ===
+L02;Lamp Pro;2000;1;SKIP:quantity must be in [5, 100]
+# === Пустые и неверно записанные значения ===
+;No Id;100;5;SKIP:id is null or blank
+C01;;500;5;SKIP:name is null or blank
+C02;Cable;abc;5;SKIP:price is not a number
+C03;Cable;500;five;SKIP:quantity is not an integer
+C04;Cable;500;5.5;SKIP:quantity is not an integer
+C05; Cable;500;5;SKIP:surrounding spaces
+# === Вариант 2: количество меньше 5 для нового товара отклоняется, добавка к существующему допустима ===
+C06;Cable;500;5;OK:qty=5
+C06;Cable;500;2;OK:merged,qty=7
+C07;Cable Pro;800;4;SKIP:quantity must be in [5, 100]
+# === Удаление позиции ===
+!remove;P01;;;OK
+!remove;ZZZ;;;SKIP:product not found
+# === Итог до подтверждения: 6 позиций ===
+TOTAL;positions=6;sum=742320.00
+# === После подтверждения (R8) изменения запрещены ===
+!confirm;;;;OK:status=CONFIRMED
+M03;Mouse;1500;5;ERROR:IllegalStateException
+!confirm;;;;ERROR:IllegalStateException
+!remove;M01;;;ERROR:IllegalStateException

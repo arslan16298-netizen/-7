@@ -1,0 +1,42 @@
+digraph activity {
+    rankdir=TB;
+    dpi=170;
+    nodesep=0.35;
+    ranksep=0.38;
+    node [fontname="DejaVu Sans", fontsize=13, style="rounded,filled", shape=box, fillcolor="#e3f0ff", color="#4a6fa5", margin="0.18,0.1"];
+    edge [fontname="DejaVu Sans", fontsize=12, color="#444444"];
+
+    start [label="Начало", shape=ellipse, fillcolor="#e0f2d8", color="#5a9a3c"];
+    n1 [label="Создать заказ сотрудника\n(статус DRAFT, список позиций пуст)"];
+    n2 [label="Получить товар и количество\n(строка CSV или команда add)", shape=parallelogram, fillcolor="#e6e0f5", color="#7a64b0"];
+    a1 [label="A1: Проверить товар: id и name не пустые,\nprice > 0 (конструктор Product, R1–R3)"];
+    n4 [label="Товар корректен?", shape=diamond, style=filled, fillcolor="#fff7c9", color="#b59a1e"];
+    n3 [label="Заказ уже CONFIRMED?\n(addProduct, R8)", shape=diamond, style=filled, fillcolor="#fff7c9", color="#b59a1e"];
+    n5 [label="Товар с таким id\nуже есть в заказе?", shape=diamond, style=filled, fillcolor="#fff7c9", color="#b59a1e"];
+    n6a [label="Увеличить количество\nсуществующей позиции:\nincrease(quantity), R7"];
+    n6b [label="Создать новую позицию:\nnew OrderItem(product, quantity)"];
+    q [label="Итоговое количество позиции\nв диапазоне 5–100? (R4, вариант 2)", shape=diamond, style=filled, fillcolor="#fff7c9", color="#b59a1e"];
+    err [label="Отклонить позицию:\nIllegalArgumentException\n(заказ не меняется)", fillcolor="#fde0e0", color="#c05050"];
+    errs [label="Отклонить действие:\nIllegalStateException\n(заказ подтверждён)", fillcolor="#fde0e0", color="#c05050"];
+    n7 [label="Есть ещё позиции?", shape=diamond, style=filled, fillcolor="#fff7c9", color="#b59a1e"];
+    n8 [label="Рассчитать итог: сумма lineTotal\nвсех позиций, без поля total (R9)"];
+    a2 [label="A2: Подтвердить заказ: заказ не пуст (R10) и ещё DRAFT,\nзатем DRAFT → CONFIRMED (R8)"];
+    end [label="Завершение", shape=ellipse, fillcolor="#ffe3cc", color="#d08040"];
+
+    start -> n1 -> n2 -> a1 -> n4;
+    n4 -> n3 [label=" да"];
+    n4 -> err [label=" нет"];
+    n3 -> errs [label=" да"];
+    n3 -> n5 [label=" нет"];
+    n5 -> n6a [label=" да"];
+    n5 -> n6b [label=" нет"];
+    n6a -> q;
+    n6b -> q;
+    q -> n7 [label=" да"];
+    q -> err [label=" нет"];
+    err -> n7;
+    errs -> n7;
+    n7 -> n2 [label=" да"];
+    n7 -> n8 [label=" нет"];
+    n8 -> a2 -> end;
+}
